@@ -1,58 +1,63 @@
 <template>
-  <div class="hello">
-    <h1>{{ msg }}</h1>
-    <p>
-      For a guide and recipes on how to configure / customize this project,<br>
-      check out the
-      <a href="https://cli.vuejs.org" target="_blank" rel="noopener">vue-cli documentation</a>.
-    </p>
-    <h3>Installed CLI Plugins</h3>
-    <ul>
-      <li><a href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-babel" target="_blank" rel="noopener">babel</a></li>
-      <li><a href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-eslint" target="_blank" rel="noopener">eslint</a></li>
-    </ul>
-    <h3>Essential Links</h3>
-    <ul>
-      <li><a href="https://vuejs.org" target="_blank" rel="noopener">Core Docs</a></li>
-      <li><a href="https://forum.vuejs.org" target="_blank" rel="noopener">Forum</a></li>
-      <li><a href="https://chat.vuejs.org" target="_blank" rel="noopener">Community Chat</a></li>
-      <li><a href="https://twitter.com/vuejs" target="_blank" rel="noopener">Twitter</a></li>
-      <li><a href="https://news.vuejs.org" target="_blank" rel="noopener">News</a></li>
-    </ul>
-    <h3>Ecosystem</h3>
-    <ul>
-      <li><a href="https://router.vuejs.org" target="_blank" rel="noopener">vue-router</a></li>
-      <li><a href="https://vuex.vuejs.org" target="_blank" rel="noopener">vuex</a></li>
-      <li><a href="https://github.com/vuejs/vue-devtools#vue-devtools" target="_blank" rel="noopener">vue-devtools</a></li>
-      <li><a href="https://vue-loader.vuejs.org" target="_blank" rel="noopener">vue-loader</a></li>
-      <li><a href="https://github.com/vuejs/awesome-vue" target="_blank" rel="noopener">awesome-vue</a></li>
-    </ul>
+  <div class="wrapper">
+    <nav class="navbar navbar-dark bg-dark p-2">
+      <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search" v-model="searchQuery">
+      <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+    </nav>
+    <div class="cards-container">
+      <div class="card text-white bg-dark mb-3" style="width:48%" v-for="post in filteredPosts" :key="post.id">
+        <div class="card-header">{{post.name}}</div>
+        <div class="card-body">
+          <h5 class="card-title">{{post.username}}</h5>
+          <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
-
 <script>
+import axios from 'axios'
 export default {
-  name: 'HelloWorld',
-  props: {
-    msg: String
-  }
+  computed: {
+    filteredPosts() {
+      if (this.searchQuery == '') {
+        return this.posts;
+      } else {
+        return this.posts.filter(post => post.name.toLowerCase().includes(this.searchQuery.toLowerCase()));
+      }
+    }
+  },
+  mounted() {
+    this.loadPosts();
+  },
+  data() {
+    return {
+      posts: [],
+      searchQuery: ''
+    }
+  },
+  methods: {
+    loadPosts(){
+      axios.get('https://jsonplaceholder.typicode.com/users').then((res)=>{
+        this.posts = res.data
+      })
+    }
+  },
 }
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-h3 {
-  margin: 40px 0 0;
+.cards-container{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-top: 20px;
+    justify-content: space-between;
 }
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
-a {
-  color: #42b983;
+.wrapper{
+  max-width:1200px;
+  margin: 0 auto;
+  padding-top:100px;
+  padding-bottom:100px;
 }
 </style>
